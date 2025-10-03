@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Festival Tabs</title>
+  <style>
+    body { font-family: sans-serif; background: #fff; padding: 20px; }
+    .tabs { display: flex; cursor: pointer; margin-bottom: 20px; }
+    .tab { padding: 10px 20px; background: #eee; margin-right: 5px; border-radius: 5px; }
+    .tab.active { background: #333; color: white; }
+    .content { display: none; }
+    .content.active { display: block; }
+    img { max-width: 100%; margin-top: 10px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+
+<h2>Festival Explorer</h2>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('food')">Food Stall</div>
+  <div class="tab" onclick="showTab('games')">Games</div>
+  <div class="tab" onclick="showTab('artifacts')">Artifacts</div>
+</div>
+
+<div id="food" class="content active">
+  <p>Delicious bites from every corner of the globe.</p>
+  <img src="https://stockcake.com/i/bustling-food-stall_1261193_917827" alt="Food Stall">
+</div>
+<div id="games" class="content">
+  <p>Fun and excitement for all ages!</p>
+  <img src="https://punishedbacklog.com/wp-content/uploads/2022/03/best-video-games-of-all-time.jpg" alt="Games">
+</div>
+<div id="artifacts" class="content">
+  <p>Step into history through rare artifacts.</p>
+  <img src="https://images.stockcake.com/public/3/7/d/37d93194-31ab-4843-a4e2-0984402c61c4_large/ancient-artifacts-display-stockcake.jpg">
+</div>
+
+<script>
+  function showTab(id) {
+    const tabs = document.querySelectorAll('.tab');
+    const contents = document.querySelectorAll('.content');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    contents.forEach(content => content.classList.remove('active'));
+    document.querySelector(`.tab[onclick*="${id}"]`).classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+</script>
+
+</body>
+</html>

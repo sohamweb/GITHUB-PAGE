@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Highway Dodge with Images</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #222;
+      font-family: Arial, sans-serif;
+    }
+    #scoreDisplay {
+      position: absolute;
+      top: 10px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 24px;
+      z-index: 2;
+    }
+    #startScreen {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      cursor: pointer;
+      z-index: 3;
+    }
+    canvas {
+      display: block;
+      margin: auto;
+      background: #444;
+    }
+  </style>
+</head>
+<body>
+  <div id="scoreDisplay">Score: 0</div>
+  <div id="startScreen">🚗 Click to Start</div>
+  <canvas id="gameCanvas" width="400" height="600"></canvas>
+  <audio id="crashSound" src="https://www.soundjay.com/button/sounds/button-10.mp3"></audio>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const startScreen = document.getElementById('startScreen');
+    const crashSound = document.getElementById('crashSound');
+
+    const carWidth = 40;
+    const carHeight = 80;
+    let player = { x: 180, y: 500, width: carWidth, height: carHeight };
+    let enemies = [];
+    let speed = 5;
+    let score = 0;
+    let gameOver = false;
+    let gameStarted = false;
+
+    const playerImg = new Image();
+    playerImg.src = 'player-car.png';
+
+    const enemyImg = new Image();
+    enemyImg.src = 'enemy-car.png';
+
+    function drawLaneMarkings() {
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < canvas.height; i += 40) {
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, i);
+        ctx.lineTo(canvas.width / 2, i + 20);
+        ctx.stroke();
+      }
+    }
+
+    function spawnEnemy() {
+      const x = Math.floor(Math.random() * (canvas.width - carWidth));
+      enemies.push({ x: x, y: -carHeight, width: carWidth, height: carHeight });
+    }
+
+    function updateScore() {
+      scoreDisplay.textContent = "Score: " + score;
+    }
+
+    function update() {
+      if (!gameStarted || gameOver) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawLaneMarkings();
+      ctx.drawImage(playerImg, player.x, player.y, carWidth, carHeight);
+
+      enemies.forEach((enemy, index) => {
+        enemy.y += speed;
+        ctx.drawImage(enemyImg, enemy.x, enemy.y, carWidth, carHeight);
+
+        if (
+          enemy.x < player.x + player.width &&
+          enemy.x + enemy.width > player.x &&
+          enemy.y < player.y + player.height &&
+          enemy.y + enemy.height > player.y
+        ) {
+          crashSound.play();
+          gameOver = true;
+          alert("💥 Crash! Game Over. Final Score: " + score);
+          return;
+        }
+
+        if (enemy.y > canvas.height) {
+          enemies.splice(index, 1);
+          score++;
+          updateScore();
+        }
+      });
+
+      requestAnimationFrame(update);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (!gameStarted || gameOver) return;
+      if (e.key === 'ArrowLeft' && player.x > 0) player.x -= 20;
+      if (e.key === 'ArrowRight' && player.x < canvas.width - carWidth) player.x += 20;
+    });
+
+    startScreen.onclick = () => {
+      startScreen.style.display = 'none';
+      gameStarted = true;
+      setInterval(spawnEnemy, 1000);
+      update();
+    };
+  </script>
+</body>
+</html>
